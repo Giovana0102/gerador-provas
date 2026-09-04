@@ -5,6 +5,13 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "API funcionando",
+  });
+});
+
 app.get("/subjects", async (req, res) => {
   try {
     const subjects = await prisma.subject.findMany({

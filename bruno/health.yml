@@ -1,0 +1,17 @@
+info:
+  name: Health
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: {{baseUrl}}/health
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: Verifica se a API está funcionando.

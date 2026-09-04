@@ -1,0 +1,17 @@
+info:
+  name: Listar matérias
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: {{baseUrl}}/subjects
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: Retorna todas as matérias cadastradas, incluindo os dados públicos do professor responsável.
