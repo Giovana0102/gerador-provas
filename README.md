@@ -41,15 +41,15 @@ GET  /users
 GET  /users/:id
 POST /users
 
-Matérias
+## Matérias
 GET  /subjects
 GET  /subjects/:id
 POST /subjects
-Questões
+## Questões
 GET  /questions
 GET  /questions/:id
 POST /questions
-Health Check
+## Health Check
 GET /health
 Como executar o projeto
 
