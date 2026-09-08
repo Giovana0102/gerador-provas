@@ -1,102 +1,59 @@
 import express from "express";
+
 import prisma from "./config/database.js";
+import userRoutes from "./routes/userRoutes.js";
+import subjectRoutes from "./routes/subjectRoutes.js";
+import questionRoutes from "./routes/questionRoutes.js";
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "API funcionando",
+/**
+ * Verifica se a API e o banco de dados estão funcionando.
+ */
+app.get("/health", async (req, res) => {
+  let databaseStatus = "OK";
+  let databaseMessage = "Conexão com banco de dados funcionando";
+
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+  } catch (error) {
+    databaseStatus = "ERROR";
+    databaseMessage = "Falha na conexão com banco de dados";
+    console.error("Erro na verificação do banco:", error);
+  }
+
+  const httpStatus = databaseStatus === "OK" ? 200 : 503;
+
+  res.status(httpStatus).json({
+    status: databaseStatus === "OK" ? "OK" : "DEGRADED",
+    message: "API do Gerador de Provas",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0",
+    services: {
+      api: "OK",
+      database: {
+        status: databaseStatus,
+        message: databaseMessage,
+      },
+    },
   });
 });
 
-app.get("/subjects", async (req, res) => {
-  try {
-    const subjects = await prisma.subject.findMany({
-      select: {
-        id: true,
-        nome: true,
-        ativa: true,
-        createdAt: true,
-        updatedAt: true,
-        professor: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            foto: true,
-            papel: true,
-          },
-        },
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
+// Rotas da API
+app.use("/users", userRoutes);
+app.use("/subjects", subjectRoutes);
+app.use("/questions", questionRoutes);
 
-    res.status(200).json({
-      success: true,
-      data: subjects,
-      total: subjects.length,
-    });
-  } catch (error) {
-    console.error("Erro ao buscar matérias:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Erro ao buscar matérias",
-    });
-  }
-});
-
-app.get("/questions", async (req, res) => {
-  try {
-    const questions = await prisma.question.findMany({
-      select: {
-        id: true,
-        enunciado: true,
-        dificuldade: true,
-        respostaCorreta: true,
-        ativa: true,
-        createdAt: true,
-        updatedAt: true,
-        subject: {
-          select: {
-            id: true,
-            nome: true,
-            ativa: true,
-          },
-        },
-        author: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            foto: true,
-            papel: true,
-          },
-        },
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
-
-    res.status(200).json({
-      success: true,
-      data: questions,
-      total: questions.length,
-    });
-  } catch (error) {
-    console.error("Erro ao buscar questões:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Erro ao buscar questões",
-    });
-  }
+/**
+ * Trata requisições que não correspondem a nenhuma rota.
+ */
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Rota ${req.method} ${req.originalUrl} não encontrada`,
+  });
 });
 
 export default app;
