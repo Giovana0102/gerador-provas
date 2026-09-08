@@ -72,7 +72,7 @@ npx prisma migrate dev
 
 npx prisma generate
 
-##Inicie a API:
+## Inicie a API:
  
 npm run dev
 
