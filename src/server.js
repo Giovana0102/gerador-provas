@@ -4,7 +4,7 @@ import prisma from "./config/database.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, "127.0.0.1", () => {
   console.log("Servidor rodando na porta " + PORT);
   console.log("Health check: http://localhost:" + PORT + "/health");
   console.log("Usuários: http://localhost:" + PORT + "/users");
