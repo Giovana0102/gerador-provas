@@ -77,5 +77,27 @@ GET `/health`
 Primeiro, entre na pasta do projeto:
 
 ```bash
-cd gerador-provas
+
+
+Instale as dependências
+npm install
+
+Configure o arquivo .env com a variável DATABASE_URL.
+
+Execute as migrations do Prisma
+npx prisma migrate dev
+Gere o Prisma Client
+npx prisma generate
+Inicie a API
+npm run dev
+A API estará disponível em
+
+http://127.0.0.1:3000
+
+Créditos
+
+Projeto desenvolvido com auxílio do ChatGPT (OpenAI) para tirar dúvidas, ajudar na configuração do projeto, corrigir erros e entender melhor as tecnologias utilizadas.
+
+
+
 
