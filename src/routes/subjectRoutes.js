@@ -17,4 +17,10 @@ router.get("/", subjectController.getAll);
 // READ - Buscar matéria por ID
 router.get("/:id", subjectController.getById);
 
+// UPDATE - Atualizar parcialmente uma matéria
+router.patch("/:id", subjectController.update);
+
+// DELETE - Excluir uma matéria
+router.delete("/:id", subjectController.remove);
+
 export default router;

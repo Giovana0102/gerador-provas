@@ -1,15 +1,15 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import js from "@eslint/js";
+import globals from "globals";
+import eslintConfigPrettier from "eslint-config-prettier";
 
 export default [
   {
     ignores: [
-      'node_modules/**',
-      'coverage/**',
-      'dist/**',
-      'package-lock.json',
-      '**/generated/**',
+      "node_modules/**",
+      "coverage/**",
+      "dist/**",
+      "package-lock.json",
+      "**/generated/**",
     ],
   },
 
@@ -18,11 +18,11 @@ export default [
   eslintConfigPrettier,
 
   {
-    files: ['**/*.{js,mjs,cjs}'],
+    files: ["**/*.{js,mjs,cjs}"],
 
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'module',
+      sourceType: "module",
 
       globals: {
         ...globals.node,
@@ -30,11 +30,11 @@ export default [
     },
 
     rules: {
-      'no-unused-vars': [
-        'error',
+      "no-unused-vars": [
+        "error",
         {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
         },
       ],
     },

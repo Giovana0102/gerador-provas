@@ -15,12 +15,15 @@ Projeto desenvolvido para gerenciamento de usuários, matérias e questões.
 # Endpoints
 
 # Usuários
+
 GET /users
 
 # Matérias
+
 GET /subjects
 
 # Questões
+
 GET /questions
 
 ## Como executar o projeto
@@ -42,4 +45,3 @@ O servidor será iniciado na porta 3000.
 ## Testes
 
 Os endpoints foram testados utilizando o Bruno, com retorno `200 OK`.
-

@@ -17,4 +17,8 @@ router.get("/", questionController.getAll);
 // READ - Buscar questão por ID
 router.get("/:id", questionController.getById);
 
+router.patch("/:id", questionController.update);
+
+router.delete("/:id", questionController.remove);
+
 export default router;
