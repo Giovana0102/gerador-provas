@@ -1,4 +1,4 @@
-import prisma from "../config/database.js";
+import * as subjectService from "../services/subjectService.js";
 
 /**
  * Controller de Matérias
@@ -20,6 +20,20 @@ export const create = async (req, res) => {
       });
     }
 
+    if (typeof nome !== "string" || !nome.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "nome deve ser um texto não vazio",
+      });
+    }
+
+    if (ativa !== undefined && typeof ativa !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "ativa deve ser um booleano",
+      });
+    }
+
     // Validação do ID do professor
     const idProfessor = Number(professorId);
 
@@ -30,49 +44,24 @@ export const create = async (req, res) => {
       });
     }
 
-    // Verifica se o professor existe
-    const professor = await prisma.user.findUnique({
-      where: {
-        id: idProfessor,
-      },
+    // Cria a matéria através do service
+    const resultado = await subjectService.createSubject({
+      nome,
+      professorId: idProfessor,
+      ativa,
     });
 
-    if (!professor) {
+    if (!resultado.ok) {
       return res.status(404).json({
         success: false,
         message: "Professor não encontrado",
       });
     }
 
-    // Cria a matéria
-    const novaMateria = await prisma.subject.create({
-      data: {
-        nome,
-        professorId: idProfessor,
-        ativa: ativa ?? true,
-      },
-      select: {
-        id: true,
-        nome: true,
-        ativa: true,
-        createdAt: true,
-        updatedAt: true,
-        professor: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            foto: true,
-            papel: true,
-          },
-        },
-      },
-    });
-
     return res.status(201).json({
       success: true,
       message: "Matéria criada com sucesso",
-      data: novaMateria,
+      data: resultado.data,
     });
   } catch (error) {
     console.error("Erro ao criar matéria:", error);
@@ -89,27 +78,7 @@ export const create = async (req, res) => {
  */
 export const getAll = async (req, res) => {
   try {
-    const materias = await prisma.subject.findMany({
-      select: {
-        id: true,
-        nome: true,
-        ativa: true,
-        createdAt: true,
-        updatedAt: true,
-        professor: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            foto: true,
-            papel: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const materias = await subjectService.getAllSubjects();
 
     return res.status(200).json({
       success: true,
@@ -142,27 +111,7 @@ export const getById = async (req, res) => {
       });
     }
 
-    const materia = await prisma.subject.findUnique({
-      where: {
-        id: subjectId,
-      },
-      select: {
-        id: true,
-        nome: true,
-        ativa: true,
-        createdAt: true,
-        updatedAt: true,
-        professor: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            foto: true,
-            papel: true,
-          },
-        },
-      },
-    });
+    const materia = await subjectService.getSubjectById(subjectId);
 
     if (!materia) {
       return res.status(404).json({
@@ -181,6 +130,151 @@ export const getById = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Erro ao buscar matéria",
+    });
+  }
+};
+
+/**
+ * Atualiza parcialmente uma matéria.
+ */
+export const update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const subjectId = Number(id);
+
+    // Validação do ID
+    if (!Number.isInteger(subjectId) || subjectId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID inválido. Deve ser um número inteiro positivo",
+      });
+    }
+
+    const { nome, ativa, professorId } = req.body;
+
+    // Verifica se pelo menos um campo foi enviado
+    if (
+      nome === undefined &&
+      ativa === undefined &&
+      professorId === undefined
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Envie pelo menos um campo para atualizar",
+      });
+    }
+
+    // Validação do nome
+    if (nome !== undefined && (typeof nome !== "string" || !nome.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "nome deve ser um texto não vazio",
+      });
+    }
+
+    // Validação da ativa
+    if (ativa !== undefined && typeof ativa !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "ativa deve ser um booleano",
+      });
+    }
+
+    // Validação do professorId
+    let idProfessor;
+
+    if (professorId !== undefined) {
+      idProfessor = Number(professorId);
+
+      if (!Number.isInteger(idProfessor) || idProfessor <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "professorId inválido. Deve ser um número inteiro positivo",
+        });
+      }
+    }
+
+    const resultado = await subjectService.updateSubject(subjectId, {
+      ...(nome !== undefined && { nome: nome.trim() }),
+      ...(ativa !== undefined && { ativa }),
+      ...(idProfessor !== undefined && { professorId: idProfessor }),
+    });
+
+    if (!resultado.ok) {
+      if (resultado.reason === "SUBJECT_NOT_FOUND") {
+        return res.status(404).json({
+          success: false,
+          message: `Matéria com ID ${subjectId} não encontrada`,
+        });
+      }
+
+      if (resultado.reason === "PROFESSOR_NOT_FOUND") {
+        return res.status(404).json({
+          success: false,
+          message: "Professor não encontrado",
+        });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Matéria atualizada com sucesso",
+      data: resultado.data,
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar matéria:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao atualizar matéria",
+    });
+  }
+};
+
+/**
+ * Exclui uma matéria sem questões vinculadas.
+ */
+export const remove = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const subjectId = Number(id);
+
+    // Validação do ID
+    if (!Number.isInteger(subjectId) || subjectId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "ID inválido. Deve ser um número inteiro positivo",
+      });
+    }
+
+    const resultado = await subjectService.deleteSubject(subjectId);
+
+    if (!resultado.ok) {
+      if (resultado.reason === "SUBJECT_NOT_FOUND") {
+        return res.status(404).json({
+          success: false,
+          message: `Matéria com ID ${subjectId} não encontrada`,
+        });
+      }
+
+      if (resultado.reason === "SUBJECT_HAS_QUESTIONS") {
+        return res.status(409).json({
+          success: false,
+          message: "Não é possível excluir uma matéria que possui questões",
+        });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Matéria excluída com sucesso",
+    });
+  } catch (error) {
+    console.error("Erro ao excluir matéria:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao excluir matéria",
     });
   }
 };
