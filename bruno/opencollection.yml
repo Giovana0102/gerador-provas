@@ -2,11 +2,3 @@ opencollection: 1.0.0
 
 info:
   name: Gerador de Provas API
-
-bundled: false
-
-extensions:
-  bruno:
-    ignore:
-      - node_modules
-      - .git

@@ -7,6 +7,8 @@
     "dev": "nodemon --watch src --watch generated/prisma --ext js,ts,json --exec tsx src/server.js",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:pratica": "vitest run tests/users.test.js tests/middlewares.test.js",
+    "test:atividade": "vitest run tests/subjects-and-questions.test.js",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "format:check": "prettier --check ."
@@ -20,7 +22,8 @@
     "@prisma/client": "^7.10.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "pg": "^8.23.0"
+    "pg": "^8.23.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

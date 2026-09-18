@@ -1,86 +1,36 @@
-import prisma from "../config/database.js";
+import * as userService from "../services/userService.js";
 
 /**
- * Controller de Usuários
- * Responsável pelas operações de criação e leitura de usuários.
+ * Cria um novo usuário.
+ * @param {import("express").Request} req - Requisição HTTP.
+ * @param {import("express").Response} res - Resposta HTTP.
+ * @param {import("express").NextFunction} next - Próximo middleware.
+ * @returns {Promise<void>}
  */
-
-export const create = async (req, res) => {
+export const create = async (req, res, next) => {
   try {
-    const { nome, email, papel, foto } = req.body;
-
-    if (!nome || !email) {
-      return res.status(400).json({
-        success: false,
-        message: "Nome e email são obrigatórios",
-      });
-    }
-
-    const emailExistente = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (emailExistente) {
-      return res.status(409).json({
-        success: false,
-        message: "Email já cadastrado no sistema",
-      });
-    }
-
-    const novoUsuario = await prisma.user.create({
-      data: {
-        nome,
-        email,
-        papel: papel || "PROFESSOR",
-        foto: foto || null,
-      },
-      select: {
-        id: true,
-        nome: true,
-        email: true,
-        papel: true,
-        foto: true,
-        createdAt: true,
-      },
-    });
+    const usuario = await userService.createUser(req.body);
 
     return res.status(201).json({
       success: true,
       message: "Usuário criado com sucesso",
-      data: novoUsuario,
+      data: usuario,
     });
   } catch (error) {
-    console.error("Erro ao criar usuário:", error);
-
-    if (error.code === "P2002") {
-      return res.status(409).json({
-        success: false,
-        message: "Email já cadastrado no sistema",
-      });
-    }
-
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao criar usuário",
-    });
+    return next(error);
   }
 };
 
-export const getAll = async (req, res) => {
+/**
+ * Lista todos os usuários.
+ * @param {import("express").Request} req - Requisição HTTP.
+ * @param {import("express").Response} res - Resposta HTTP.
+ * @param {import("express").NextFunction} next - Próximo middleware.
+ * @returns {Promise<void>}
+ */
+export const getAll = async (req, res, next) => {
   try {
-    const usuarios = await prisma.user.findMany({
-      select: {
-        id: true,
-        nome: true,
-        email: true,
-        papel: true,
-        foto: true,
-        createdAt: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const usuarios = await userService.getAllUsers();
 
     return res.status(200).json({
       success: true,
@@ -88,56 +38,67 @@ export const getAll = async (req, res) => {
       total: usuarios.length,
     });
   } catch (error) {
-    console.error("Erro ao listar usuários:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao listar usuários",
-    });
+    return next(error);
   }
 };
 
-export const getById = async (req, res) => {
+/**
+ * Busca um usuário pelo ID.
+ * @param {import("express").Request} req - Requisição HTTP.
+ * @param {import("express").Response} res - Resposta HTTP.
+ * @param {import("express").NextFunction} next - Próximo middleware.
+ * @returns {Promise<void>}
+ */
+export const getById = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const userId = Number(id);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "ID inválido. Deve ser um número inteiro positivo",
-      });
-    }
-
-    const usuario = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        nome: true,
-        email: true,
-        papel: true,
-        foto: true,
-        createdAt: true,
-      },
-    });
-
-    if (!usuario) {
-      return res.status(404).json({
-        success: false,
-        message: `Usuário com ID ${userId} não encontrado`,
-      });
-    }
+    const usuario = await userService.getUserById(req.params.id);
 
     return res.status(200).json({
       success: true,
       data: usuario,
     });
   } catch (error) {
-    console.error("Erro ao buscar usuário:", error);
+    return next(error);
+  }
+};
 
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao buscar usuário",
+/**
+ * Atualiza parcialmente um usuário.
+ * @param {import("express").Request} req - Requisição HTTP.
+ * @param {import("express").Response} res - Resposta HTTP.
+ * @param {import("express").NextFunction} next - Próximo middleware.
+ * @returns {Promise<void>}
+ */
+export const update = async (req, res, next) => {
+  try {
+    const usuario = await userService.updateUser(req.params.id, req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "Usuário atualizado com sucesso",
+      data: usuario,
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * Exclui um usuário.
+ * @param {import("express").Request} req - Requisição HTTP.
+ * @param {import("express").Response} res - Resposta HTTP.
+ * @param {import("express").NextFunction} next - Próximo middleware.
+ * @returns {Promise<void>}
+ */
+export const remove = async (req, res, next) => {
+  try {
+    const usuario = await userService.deleteUser(req.params.id);
+    return res.status(200).json({
+      success: true,
+      message: "Usuário excluído com sucesso",
+      data: usuario,
+    });
+  } catch (error) {
+    return next(error);
   }
 };
