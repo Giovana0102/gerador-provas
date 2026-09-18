@@ -1,5 +1,7 @@
 import prisma from "../config/database.js";
 
+import { NotFoundError } from "../errors/AppError.js";
+
 const publicQuestionSelect = {
   id: true,
   enunciado: true,
@@ -26,6 +28,10 @@ const publicQuestionSelect = {
   },
 };
 
+/**
+ * Lista todas as questões.
+ * @returns {Promise<Array>} Questões encontradas.
+ */
 export const getAllQuestions = async () => {
   return prisma.question.findMany({
     select: publicQuestionSelect,
@@ -35,15 +41,33 @@ export const getAllQuestions = async () => {
   });
 };
 
+/**
+ * Busca uma questão pelo ID.
+ * @param {number} questionId - ID da questão.
+ * @returns {Promise<Object>} Questão encontrada.
+ * @throws {NotFoundError} Quando a questão não existe.
+ */
 export const getQuestionById = async (questionId) => {
-  return prisma.question.findUnique({
+  const question = await prisma.question.findUnique({
     where: {
       id: questionId,
     },
     select: publicQuestionSelect,
   });
+
+  if (!question) {
+    throw new NotFoundError(`Questão com ID ${questionId} não encontrada`);
+  }
+
+  return question;
 };
 
+/**
+ * Cria uma nova questão.
+ * @param {Object} questionData - Dados da questão.
+ * @returns {Promise<Object>} Questão criada.
+ * @throws {NotFoundError} Quando o subject ou autor não existe.
+ */
 export const createQuestion = async (questionData) => {
   const subject = await prisma.subject.findUnique({
     where: {
@@ -55,10 +79,9 @@ export const createQuestion = async (questionData) => {
   });
 
   if (!subject) {
-    return {
-      ok: false,
-      reason: "SUBJECT_NOT_FOUND",
-    };
+    throw new NotFoundError(
+      `Matéria com ID ${questionData.subjectId} não encontrada`,
+    );
   }
 
   const author = await prisma.user.findUnique({
@@ -71,15 +94,14 @@ export const createQuestion = async (questionData) => {
   });
 
   if (!author) {
-    return {
-      ok: false,
-      reason: "AUTHOR_NOT_FOUND",
-    };
+    throw new NotFoundError(
+      `Usuário com ID ${questionData.authorId} não encontrado`,
+    );
   }
 
-  const question = await prisma.question.create({
+  return prisma.question.create({
     data: {
-      enunciado: questionData.enunciado.trim(),
+      enunciado: questionData.enunciado,
       dificuldade: questionData.dificuldade,
       respostaCorreta: questionData.respostaCorreta ?? null,
       subjectId: questionData.subjectId,
@@ -88,13 +110,15 @@ export const createQuestion = async (questionData) => {
     },
     select: publicQuestionSelect,
   });
-
-  return {
-    ok: true,
-    data: question,
-  };
 };
 
+/**
+ * Atualiza parcialmente uma questão.
+ * @param {number} questionId - ID da questão.
+ * @param {Object} questionData - Campos a atualizar.
+ * @returns {Promise<Object>} Questão atualizada.
+ * @throws {NotFoundError} Quando a questão, subject ou autor não existe.
+ */
 export const updateQuestion = async (questionId, questionData) => {
   const question = await prisma.question.findUnique({
     where: {
@@ -106,10 +130,7 @@ export const updateQuestion = async (questionId, questionData) => {
   });
 
   if (!question) {
-    return {
-      ok: false,
-      reason: "QUESTION_NOT_FOUND",
-    };
+    throw new NotFoundError(`Questão com ID ${questionId} não encontrada`);
   }
 
   if (questionData.subjectId !== undefined) {
@@ -123,10 +144,9 @@ export const updateQuestion = async (questionId, questionData) => {
     });
 
     if (!subject) {
-      return {
-        ok: false,
-        reason: "SUBJECT_NOT_FOUND",
-      };
+      throw new NotFoundError(
+        `Matéria com ID ${questionData.subjectId} não encontrada`,
+      );
     }
   }
 
@@ -141,27 +161,27 @@ export const updateQuestion = async (questionId, questionData) => {
     });
 
     if (!author) {
-      return {
-        ok: false,
-        reason: "AUTHOR_NOT_FOUND",
-      };
+      throw new NotFoundError(
+        `Usuário com ID ${questionData.authorId} não encontrado`,
+      );
     }
   }
 
-  const updatedQuestion = await prisma.question.update({
+  return prisma.question.update({
     where: {
       id: questionId,
     },
     data: questionData,
     select: publicQuestionSelect,
   });
-
-  return {
-    ok: true,
-    data: updatedQuestion,
-  };
 };
 
+/**
+ * Remove uma questão.
+ * @param {number} questionId - ID da questão.
+ * @returns {Promise<Object>} Resultado da exclusão.
+ * @throws {NotFoundError} Quando a questão não existe.
+ */
 export const deleteQuestion = async (questionId) => {
   const question = await prisma.question.findUnique({
     where: {
@@ -173,10 +193,7 @@ export const deleteQuestion = async (questionId) => {
   });
 
   if (!question) {
-    return {
-      ok: false,
-      reason: "QUESTION_NOT_FOUND",
-    };
+    throw new NotFoundError(`Questão com ID ${questionId} não encontrada`);
   }
 
   await prisma.question.delete({
@@ -186,6 +203,7 @@ export const deleteQuestion = async (questionId) => {
   });
 
   return {
-    ok: true,
+    success: true,
+    data: question,
   };
 };
