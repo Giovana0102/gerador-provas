@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { numericInputSchema, positiveIdSchema } from "./idSchema.js";
+import {
+  numericInputSchema,
+  positiveIdSchema,
+} from "../../../schemas/idSchema.js";
 
 const enunciadoSchema = z
   .string()

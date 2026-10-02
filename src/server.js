@@ -7,9 +7,8 @@ const PORT = Number(process.env.PORT) || 3000;
 const server = app.listen(PORT, "127.0.0.1", () => {
   console.log("Servidor rodando na porta " + PORT);
   console.log("Health check: http://localhost:" + PORT + "/health");
-  console.log("Usuários: http://localhost:" + PORT + "/users");
-  console.log("Matérias: http://localhost:" + PORT + "/subjects");
-  console.log("Questões: http://localhost:" + PORT + "/questions");
+  console.log("API v1: http://localhost:" + PORT + "/v1");
+  console.log("Usuários v1: http://localhost:" + PORT + "/v1/users");
 });
 
 async function shutdown(signal) {
