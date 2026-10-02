@@ -2,11 +2,7 @@ import express from "express";
 
 import prisma from "./config/database.js";
 
-import userRoutes from "./routes/userRoutes.js";
-
-import subjectRoutes from "./routes/subjectRoutes.js";
-
-import questionRoutes from "./routes/questionRoutes.js";
+import v1Routes from "./api/v1/routes/index.js";
 
 import errorHandler, { notFoundHandler } from "./middlewares/errorHandler.js";
 
@@ -17,7 +13,7 @@ app.use(express.json({ limit: "100kb" }));
 /**
  * Verifica se a API e o banco de dados estão funcionando.
  */
-app.get("/health", async (req, res) => {
+app.get("/health", async (_req, res) => {
   let databaseStatus = "OK";
   let databaseMessage = "Conexão com banco de dados funcionando";
 
@@ -36,6 +32,7 @@ app.get("/health", async (req, res) => {
     message: "API do Gerador de Provas",
     timestamp: new Date().toISOString(),
     version: "1.0.0",
+    availableVersions: ["v1"],
     services: {
       api: "OK",
       database: {
@@ -47,11 +44,10 @@ app.get("/health", async (req, res) => {
 });
 
 // Rotas da API
-app.use("/users", userRoutes);
-app.use("/subjects", subjectRoutes);
-app.use("/questions", questionRoutes);
+app.use("/v1", v1Routes);
 
 app.use(notFoundHandler);
+
 app.use(errorHandler);
 
 export default app;
