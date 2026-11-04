@@ -4,12 +4,15 @@ import userRoutes from "./userRoutes.js";
 // MODIFICADO: importa somente os dois módulos V2 da atividade.
 import subjectRoutes from "./subjectRoutes.js";
 import questionRoutes from "./questionRoutes.js";
+// ADICIONADO: cadastro, login e usuário autenticado.
+import authRoutes from "./authRoutes.js";
 
 const router = express.Router();
 
 router.get("/health", (_req, res) => {
   res.status(200).json({ status: "OK", version: "v2" });
 });
+router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 // MODIFICADO: publica contratos estáveis sem alterar seus arquivos V1.
 router.use("/subjects", subjectRoutes);
