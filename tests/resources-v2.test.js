@@ -155,9 +155,9 @@ describe.each(["subjects", "questions"])(
       async (method) => {
         const agent = request(app);
         for (const id of ["abc", "0", "-1", "1.5", "2147483648"]) {
-          const response = await agent[method](`/v2/${resource}/${id}`).send(
-            method === "patch" ? { ativa: false } : undefined,
-          );
+          const response = await agent[method](`/v2/${resource}/${id}`)
+            .set(adminAuth)
+            .send(method === "patch" ? { ativa: false } : undefined);
           expectError(response, 400, "VALIDATION_ERROR");
         }
       },
@@ -172,9 +172,9 @@ describe.each(["subjects", "questions"])(
         await prisma.question.delete({ where: { id: f.question.id } });
         if (resource === "subjects")
           await prisma.subject.delete({ where: { id: f.subject.id } });
-        const response = await agent[method](`/v2/${resource}/${id}`).send(
-          method === "patch" ? { ativa: false } : undefined,
-        );
+        const response = await agent[method](`/v2/${resource}/${id}`)
+          .set(adminAuth)
+          .send(method === "patch" ? { ativa: false } : undefined);
         expectError(response, 404, "NOT_FOUND");
         expect(response.body.error.message).toContain(
           resource === "subjects" ? "Matéria com ID" : "Questão com ID",
