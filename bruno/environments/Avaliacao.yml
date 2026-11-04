@@ -4,5 +4,7 @@
     [
       { "name": "baseUrl", "value": "http://127.0.0.1:59313" },
       { "name": "uploadStubUrl", "value": "http://127.0.0.1:59314" },
+      { "name": "adminEmail", "value": "admin.avaliacao@example.com" },
+      { "name": "adminPassword", "value": "senha-admin-avaliacao" },
     ],
 }
