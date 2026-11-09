@@ -14,7 +14,7 @@ export default defineConfig({
     environment: "node",
     env: {
       DATABASE_URL: process.env.TEST_DATABASE_URL,
-      // ADICIONADO: valores exclusivos de teste, sem relação com segredos reais.
+      // ADICIONADO (aula 11): valores exclusivos de teste, sem relação com segredos reais.
       JWT_SECRET: "segredo-somente-para-testes-0123456789abcdef",
       JWT_EXPIRES_IN: "15m",
       // Custo mínimo do bcrypt: os testes medem comportamento, não resistência.

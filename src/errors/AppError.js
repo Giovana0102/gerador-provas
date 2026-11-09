@@ -50,7 +50,7 @@ export class ConflictError extends AppError {
   }
 }
 
-// ADICIONADO: 401 indica que a identidade não foi comprovada (sem token ou token inválido).
+// ADICIONADO (aula 11): 401 indica que a identidade não foi comprovada (sem token ou token inválido).
 /** Erro para requisições sem autenticação válida. */
 export class UnauthorizedError extends AppError {
   /** @param {string} [message="Autenticação necessária"] - Motivo seguro da recusa. */
@@ -59,7 +59,7 @@ export class UnauthorizedError extends AppError {
   }
 }
 
-// ADICIONADO: 403 indica identidade comprovada, mas sem permissão para a ação.
+// ADICIONADO (aula 11): 403 indica identidade comprovada, mas sem permissão para a ação.
 /** Erro para usuários autenticados que não têm permissão. */
 export class ForbiddenError extends AppError {
   /** @param {string} [message="Acesso negado"] - Motivo seguro da recusa. */

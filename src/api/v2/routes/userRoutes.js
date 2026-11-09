@@ -3,7 +3,7 @@ import express from "express";
 import uploadPhoto from "../../../config/multer.js";
 import * as userController from "../controllers/userController.js";
 import validate from "../../../middlewares/validate.js";
-// ADICIONADO: autenticação (quem é) e autorização (o que pode fazer).
+// ADICIONADO (aula 11): autenticação (quem é) e autorização (o que pode fazer).
 import authenticate from "../../../middlewares/auth.js";
 import {
   isAdmin,
@@ -19,6 +19,7 @@ import {
 const router = express.Router();
 
 // ADICIONADO: componentes V2 (usuário, envelopes, corpos e erros de upload).
+// MODIFICADO (aula 11): senha opcional em CreateUserV2 e CreateUserV2Multipart.
 /**
  * @swagger
  * components:
@@ -244,6 +245,7 @@ function validateUpdateWithPhoto(req, res, next) {
 }
 
 // ADICIONADO: POST aceita JSON ou multipart; documenta todos os status observáveis.
+// MODIFICADO (aula 11): descrição, security bearerAuth e respostas 401 e 403.
 /**
  * @swagger
  * /v2/users:
@@ -284,7 +286,7 @@ function validateUpdateWithPhoto(req, res, next) {
  *       503:
  *         $ref: '#/components/responses/UploadNotConfigured'
  */
-// MODIFICADO: somente ADMIN cria usuários; a checagem vem antes do upload.
+// MODIFICADO (aula 11): somente ADMIN cria usuários; a checagem vem antes do upload.
 router.post(
   "/",
   authenticate,
@@ -336,6 +338,7 @@ router.get("/", userController.getAll);
 router.get("/:id", validate(idParamSchema, "params"), userController.getById);
 
 // ADICIONADO: PATCH parcial com os mesmos dois formatos de corpo do POST.
+// MODIFICADO (aula 11): descrição, security bearerAuth e respostas 401 e 403.
 /**
  * @swagger
  * /v2/users/{id}:
@@ -380,7 +383,7 @@ router.get("/:id", validate(idParamSchema, "params"), userController.getById);
  *       503:
  *         $ref: '#/components/responses/UploadNotConfigured'
  */
-// MODIFICADO: exige token; PROFESSOR só altera o próprio cadastro e não muda o papel.
+// MODIFICADO (aula 11): exige token; PROFESSOR só altera o próprio cadastro e não muda o papel.
 router.patch(
   "/:id",
   authenticate,
@@ -394,6 +397,7 @@ router.patch(
 );
 
 // ADICIONADO: DELETE com conflito para usuários vinculados.
+// MODIFICADO (aula 11): descrição, security bearerAuth e respostas 401 e 403.
 /**
  * @swagger
  * /v2/users/{id}:
@@ -423,7 +427,7 @@ router.patch(
  *       409:
  *         $ref: '#/components/responses/Conflict'
  */
-// MODIFICADO: somente ADMIN remove usuários.
+// MODIFICADO (aula 11): somente ADMIN remove usuários.
 router.delete(
   "/:id",
   authenticate,

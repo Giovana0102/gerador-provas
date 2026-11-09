@@ -9,6 +9,7 @@ const definition = {
   info: {
     title: "API do Gerador de Provas",
     version: "1.0.0",
+    // MODIFICADO (aula 11): a descrição passa a citar as rotas de autenticação.
     description:
       "Documentação interativa das rotas de saúde, de autenticação e de usuários das versões V1 e V2.",
   },
@@ -21,7 +22,7 @@ const definition = {
       name: "Health",
       description: "Disponibilidade da API e da conexão com o banco",
     },
-    // ADICIONADO: grupo das rotas de cadastro, login e usuário autenticado.
+    // ADICIONADO (aula 11): grupo das rotas de cadastro, login e usuário autenticado.
     {
       name: "Autenticação",
       description: "Cadastro, login e usuário dono do token JWT",
@@ -36,7 +37,7 @@ const definition = {
     },
   ],
   components: {
-    // ADICIONADO: habilita o botão Authorize; operações o referenciam em security.
+    // ADICIONADO (aula 11): habilita o botão Authorize; operações o referenciam em security.
     securitySchemes: {
       bearerAuth: {
         type: "http",
@@ -105,7 +106,7 @@ const definition = {
           },
         },
       },
-      // ADICIONADO: respostas comuns das rotas protegidas.
+      // ADICIONADO (aula 11): respostas comuns das rotas protegidas.
       Unauthorized: {
         description:
           "Token ausente, malformado, inválido ou expirado (UNAUTHORIZED)",

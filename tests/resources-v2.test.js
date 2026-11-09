@@ -3,10 +3,10 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
 import app from "../src/app.js";
 import prisma from "../src/config/database.js";
-// ADICIONADO: as escritas na V2 passam a exigir token de ADMIN.
+// ADICIONADO (aula 11): as escritas na V2 passam a exigir token de ADMIN.
 import { createAuthUser, removeAuthUsers } from "./helpers/auth.js";
 
-// ADICIONADO: um ADMIN por arquivo, criado direto no banco e removido ao final.
+// ADICIONADO (aula 11): um ADMIN por arquivo, criado direto no banco e removido ao final.
 let adminAuth;
 beforeAll(async () => {
   ({ auth: adminAuth } = await createAuthUser({ papel: "ADMIN" }));

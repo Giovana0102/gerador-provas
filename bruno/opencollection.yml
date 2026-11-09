@@ -3,7 +3,7 @@ opencollection: 1.0.0
 info:
   name: Gerador de Provas API
 
-# ADICIONADO: antes de cada requisição, obtém uma única vez o token do ADMIN da avaliação.
+# ADICIONADO (aula 11): antes de cada requisição, obtém uma única vez o token do ADMIN da avaliação.
 # As requisições protegidas usam auth bearer com {{adminToken}}.
 request:
   scripts:
